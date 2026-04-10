@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>HuReA | Dashboard Quản Trị Thành Viên</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- ===== LOGIN OVERLAY ===== -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-mesh-bg">
+            <div class="login-blob lb-1"></div>
+            <div class="login-blob lb-2"></div>
+            <div class="login-blob lb-3"></div>
+        </div>
+        <div class="login-card" id="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h1>HuReA Hub</h1>
+                <p class="login-subtitle">Hệ thống Quản trị Thành viên</p>
+            </div>
+
+            <!-- User Login Form -->
+            <div id="login-user-form" class="login-form-section">
+                <div class="login-input-group">
+                    <label><i class="fa-solid fa-user"></i> Tài khoản thành viên</label>
+                    <div class="selected-member-card" id="selected-member-display" onclick="openLoginSelector()">
+                        <div class="selected-member-avatar">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="selected-member-info">
+                            <span class="selected-name" id="display-name">Chưa chọn thành viên</span>
+                            <span class="selected-dept" id="display-dept">Nhấn để chọn tên của bạn</span>
+                        </div>
+                        <button class="btn-change-member">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <input type="hidden" id="login-member-id" value="">
+                </div>
+
+                <!-- PIN Section (hidden until member selected) -->
+                <div id="login-pin-section" class="login-pin-section" style="display:none;">
+                    <label><i class="fa-solid fa-lock"></i> Nhập mã PIN</label>
+                    <div class="pin-input-row" id="pin-input-row">
+                        <input type="password" maxlength="1" class="pin-box" data-pin="0" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-pin="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-pin="2" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-pin="3" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-pin="4" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-pin="5" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                    </div>
+                    <div id="pin-error" class="pin-error" style="display:none;">
+                        <i class="fa-solid fa-circle-exclamation"></i> <span id="pin-error-text">Sai mã PIN, vui lòng thử lại</span>
+                    </div>
+                    <button class="btn-login" id="btn-login" onclick="handleLogin()">
+                        <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+                    </button>
+                </div>
+
+                <!-- Create PIN Section -->
+                <div id="login-create-pin-section" class="login-create-pin-section" style="display:none;">
+                    <div class="create-pin-notice">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Bạn chưa có mã PIN. Hãy tạo mã PIN 6 số để đăng nhập.</span>
+                    </div>
+                    <label><i class="fa-solid fa-key"></i> Tạo mã PIN mới (6 số)</label>
+                    <div class="pin-input-row" id="create-pin-row">
+                        <input type="password" maxlength="1" class="pin-box" data-cpin="0" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cpin="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cpin="2" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cpin="3" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cpin="4" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cpin="5" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                    </div>
+                    <label style="margin-top:12px;"><i class="fa-solid fa-check-double"></i> Nhập lại mã PIN</label>
+                    <div class="pin-input-row" id="confirm-pin-row">
+                        <input type="password" maxlength="1" class="pin-box" data-cfpin="0" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cfpin="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cfpin="2" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cfpin="3" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cfpin="4" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                        <input type="password" maxlength="1" class="pin-box" data-cfpin="5" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+                    </div>
+                    <div id="create-pin-error" class="pin-error" style="display:none;">
+                        <i class="fa-solid fa-circle-exclamation"></i> <span id="create-pin-error-text"></span>
+                    </div>
+                    <button class="btn-login btn-create-pin-action" onclick="handleCreatePin()">
+                        <i class="fa-solid fa-shield-halved"></i> Tạo PIN & Đăng nhập
+                    </button>
+                </div>
+
+                <!-- Forgot PIN -->
+                <div class="login-forgot-pin">
+                    <i class="fa-solid fa-question-circle"></i>
+                    Quên mã PIN? Liên hệ Admin: <strong>0342381843</strong>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="login-divider">
+                <span>hoặc</span>
+            </div>
+
+            <!-- Admin Quick Login -->
+            <div class="login-admin-section">
+                <button class="btn-admin-toggle" id="btn-admin-toggle" onclick="toggleAdminLogin()">
+                    <i class="fa-solid fa-user-shield"></i> Đăng nhập nhanh Admin
+                </button>
+                <div id="admin-login-form" class="admin-login-form" style="display:none;">
+                    <div class="login-input-group">
+                        <label><i class="fa-solid fa-key"></i> Mật khẩu Admin</label>
+                        <div class="admin-pw-wrapper">
+                            <input type="password" id="admin-password" placeholder="Nhập mật khẩu admin..." onkeydown="if(event.key==='Enter')handleAdminLogin()">
+                            <button class="pw-toggle-btn" onclick="togglePwVisibility('admin-password', this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="admin-error" class="pin-error" style="display:none;">
+                        <i class="fa-solid fa-circle-exclamation"></i> Sai mật khẩu Admin
+                    </div>
+                    <button class="btn-login btn-admin-login" onclick="handleAdminLogin()">
+                        <i class="fa-solid fa-bolt"></i> Đăng nhập Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mesh-background">
+        <div class="blob color-1"></div>
+        <div class="blob color-2"></div>
+        <div class="blob color-3"></div>
+    </div>
+
+    <!-- API Global Loader -->
+    <div id="global-loader"
+        style="position:fixed;inset:0;background:rgba(5,7,10,0.9);z-index:9999;display:none;justify-content:center;align-items:center;flex-direction:column;color:#fff;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:3rem;color:#f59e0b;margin-bottom:16px;"></i>
+        <h2>Đang đồng bộ Dữ Liệu...</h2>
+        <p style="color:#94a3b8;">Vui lòng đợi giây lát</p>
+    </div>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle"><i class="fa-solid fa-chart-line"></i></div>
+                <h2>HuReA Hub</h2>
+                <span class="version-badge">Admin V19</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard-view">
+                    <i class="fa-solid fa-house"></i><span>Tổng quan</span>
+                </a>
+                <a href="#" class="nav-item" data-target="members-view">
+                    <i class="fa-solid fa-users"></i><span>Tài nguyên Nhân sự</span>
+                </a>
+                <a href="#" class="nav-item" data-target="projects-view">
+                    <i class="fa-solid fa-diagram-project"></i><span>Dự án &amp; Chương trình</span>
+                </a>
+                <a href="#" class="nav-item" data-target="terms-view">
+                    <i class="fa-solid fa-calendar-check"></i><span>Quản lý Nhiệm kì </span>
+
+                </a>
+                <a href="#" class="nav-item" data-target="eval-view">
+                    <i class="fa-solid fa-star"></i><span>Đánh giá &amp; Point</span>
+                </a>
+                <a href="#" class="nav-item" data-target="feedback-view">
+                    <i class="fa-solid fa-comments"></i><span>Feedback &amp; Confession</span>
+                </a>
+                <a href="#" class="nav-item" data-target="evidence-view">
+                    <i class="fa-solid fa-folder-open"></i><span>Nộp Minh Chứng</span>
+                </a>
+                <a href="#" class="nav-item" data-target="photobooth-view">
+                    <i class="fa-solid fa-camera"></i><span>Photobooth</span>
+                </a>
+                <a href="#" class="nav-item" data-target="bug-report-view">
+                    <i class="fa-solid fa-bug"></i><span>Báo cáo lỗi</span>
+                </a>
+                <a href="#" class="nav-item" id="pin-mgmt-nav" data-target="pin-management-view">
+                    <i class="fa-solid fa-key"></i><span>Quản lý mã PIN</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="current-term-display">
+                    Nhiệm kỳ hiện tại:
+                    <strong id="active-term-label">Chưa chọn</strong>
+                </div>
+                <button class="theme-toggle" id="theme-btn">
+                    <i class="fa-solid fa-moon"></i> Chế độ tối
+                </button>
+            </div>
+        </aside>
+        <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header glass-panel">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileSidebar()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="header-title">
+                        <h1 id="page-title">Tổng quan hệ thống</h1>
+                        <p id="page-subtitle">Thống kê chi tiết &amp; tổng hợp dữ liệu</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="user-profile" id="header-user-profile">
+                        <img id="header-avatar" src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="Admin">
+                        <span id="header-username">Admin</span>
+                        <span id="header-role-badge" class="header-role-badge">Admin</span>
+                    </div>
+                    <button class="btn-logout" id="btn-logout" onclick="logout()" title="Đăng xuất">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-container">
+
+                <!-- VIEW: DASHBOARD -->
+                <section id="dashboard-view" class="view-section active">
+                    <div class="welcome-banner">
+                        <div class="welcome-content">
+                            <h2>Chào buổi sáng, Admin! 👋</h2>
+                            <p>Chào mừng bạn trở lại hệ thống quản trị HuReA. Hôm nay có thông báo mới chờ xử lý.</p>
+                        </div>
+                        <div class="welcome-info">
+                            <div class="welcome-info-item"><span>Nhiệm kỳ</span><strong>K12</strong></div>
+                            <div class="welcome-info-item"><span>Data Sync</span><strong>Online</strong></div>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                            <div class="stat-info">
+                                <h3>Tổng Thành Viên</h3>
+                                <p id="stat-total-members">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon"><i class="fa-solid fa-folder-tree"></i></div>
+                            <div class="stat-info">
+                                <h3>Dự án / Chương trình</h3>
+                                <p id="stat-total-projects">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon"><i class="fa-solid fa-star-half-stroke"></i></div>
+                            <div class="stat-info">
+                                <h3>Đã đánh giá</h3>
+                                <p id="stat-evaluated">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-announcements">
+                        <div class="announcement-column glass-panel">
+                            <div class="column-header">
+                                <div class="header-main">
+                                    <span class="icon-orb"><i class="fa-solid fa-bullhorn"></i></span>
+                                    <div class="header-text">
+                                        <h2>Bảng Tin Toàn CLB</h2>
+                                        <p>Tin tức mới nhất từ Ban Chủ Nhiệm</p>
+                                    </div>
+                                </div>
+                                <button class="btn-create-ann" onclick="openModal('announcement-modal', 'GLOBAL')"
+                                    title="Đăng tin mới">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="global-announcements-list" class="announcement-feed card-scroll">
+                                <div class="empty-feed">
+                                    <i class="fa-solid fa-scroll"></i>
+                                    <p>Chưa có thông báo toàn CLB nào được cập nhật.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="announcement-column glass-panel">
+                            <div class="column-header">
+                                <div class="header-main">
+                                    <span class="icon-orb orb-primary"><i class="fa-solid fa-building-user"></i></span>
+                                    <div class="header-text">
+                                        <h2>Thông Báo Ban</h2>
+                                        <p>Cập nhật nội bộ các ban chuyên môn</p>
+                                    </div>
+                                </div>
+                                <div class="dept-pills-v2">
+                                    <button class="pill active" onclick="filterDeptAnn('ALL')">Tất cả</button>
+                                    <button class="pill" onclick="filterDeptAnn('L&D')">L&D</button>
+                                    <button class="pill" onclick="filterDeptAnn('R&R')">R&R</button>
+                                    <button class="pill" onclick="filterDeptAnn('ER')">ER</button>
+                                    <button class="pill" onclick="filterDeptAnn('EB')">EB</button>
+                                </div>
+                                <button class="btn-create-ann secondary"
+                                    onclick="openModal('announcement-modal', 'DEPT')" title="Đăng tin ban">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="dept-announcements-list" class="announcement-feed card-scroll">
+                                <div class="empty-feed">
+                                    <i class="fa-solid fa-filter"></i>
+                                    <p>Hãy chọn ban chuyên môn để xem các thông báo nội bộ.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: MEMBERS -->
+                <section id="members-view" class="view-section">
+                    <div class="section-actions">
+                        <div style="display:flex;gap:16px;">
+                            <div class="search-box">
+                                <i class="fa-solid fa-search"></i>
+                                <input type="text" id="search-member" placeholder="Tìm kiếm thành viên..."
+                                    onkeyup="renderMembers()">
+                            </div>
+                            <select id="filter-dept" class="styled-select" onchange="renderMembers()">
+                                <option value="ALL">Tất cả Ban</option>
+                                <option value="L&D">L&D</option>
+                                <option value="R&R">R&R</option>
+                                <option value="ER">ER</option>
+                                <option value="EB">EB</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn-secondary" onclick="openModal('batch-member-modal')">
+                                <i class="fa-solid fa-paste"></i> Paste Data
+                            </button>
+                            <button class="btn-primary" onclick="openModal('member-modal')">
+                                <i class="fa-solid fa-plus"></i> Thêm 1 người
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Họ &amp; Tên</th>
+                                    <th>Ban</th>
+                                    <th>Khóa</th>
+                                    <th>Lớp</th>
+                                    <th>Chuyên ngành</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="members-tbody"></tbody>
+                        </table>
+                        <div id="members-empty" class="empty-state">Chưa có dữ liệu thành viên</div>
+                    </div>
+                </section>
+
+                <!-- VIEW: EVIDENCE -->
+                <section id="evidence-view" class="view-section">
+                    <div class="section-actions">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="search-evidence" placeholder="Tìm tên thành viên..."
+                                onkeyup="renderEvidenceFolders()">
+                        </div>
+                        <select id="filter-evidence-dept" class="styled-select" onchange="renderEvidenceFolders()">
+                            <option value="ALL">Tất cả Ban</option>
+                            <option value="L&D">L&D</option>
+                            <option value="R&R">R&R</option>
+                            <option value="ER">ER</option>
+                            <option value="EB">EB</option>
+                        </select>
+                    </div>
+
+                    <div class="drive-container">
+                        <div class="drive-header">
+                            <h3><i class="fa-solid fa-folder-tree"></i> Thư mục tập trung (Scale 10)</h3>
+                            <p>Mỗi thành viên có 1 không gian lưu trữ minh chứng riêng biệt.</p>
+                        </div>
+                        <div id="evidence-grid" class="drive-grid">
+                            <!-- Skeleton loader or empty state -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: PROJECTS -->
+                <section id="projects-view" class="view-section">
+                    <div class="section-actions">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="search-project" placeholder="Tìm kiếm dự án..."
+                                onkeyup="renderProjects()">
+                        </div>
+                        <button class="btn-primary" onclick="openModal('project-modal')">
+                            <i class="fa-solid fa-plus"></i> Thêm Dự án mới
+                        </button>
+                    </div>
+                    <div class="projects-grid" id="projects-grid"></div>
+                    <div id="projects-empty" class="empty-state" style="display:none">Chưa có dữ liệu dự án</div>
+                </section>
+
+                <!-- VIEW: TERMS -->
+                <section id="terms-view" class="view-section">
+                    <div class="section-actions">
+                        <h3>Danh sách nhiệm kỳ</h3>
+                        <button class="btn-primary" onclick="openModal('term-modal')">
+                            <i class="fa-solid fa-plus"></i> Tạo/Quản lý Nhiệm kỳ
+                        </button>
+                    </div>
+                    <div class="terms-list glass-panel" id="terms-list"></div>
+                </section>
+
+                <!-- VIEW: EVALUATION -->
+                <section id="eval-view" class="view-section">
+                    <div class="eval-tabs">
+                        <button class="eval-tab active" data-eval="eval-calc">Bảng Tính Điểm Tổng Hợp</button>
+                        <button class="eval-tab" data-eval="eval-club">2. Hoạt động CLB</button>
+                        <button class="eval-tab" data-eval="eval-dept">1. Hoạt động Ban</button>
+                        <button class="eval-tab" data-eval="eval-project">3. Form Đánh Giá chéo</button>
+                    </div>
+
+                    <div class="eval-content glass-panel">
+                        <!-- Bảng điểm tổng hợp -->
+                        <div id="eval-calc" class="eval-pane active">
+                            <div class="pane-header">
+                                <div>
+                                    <h3>Bảng Hiệu Suất Tổng Hợp (Thang 10)</h3>
+                                </div>
+                                <div style="display:flex;gap:12px;">
+                                    <button class="btn-secondary" onclick="calculateFinalScores()"><i
+                                            class="fa-solid fa-calculator"></i> Tính toán lại</button>
+                                    <button class="btn-primary" onclick="exportToExcel()"><i
+                                            class="fa-solid fa-file-excel"></i> Xuất Excel</button>
+                                </div>
+                            </div>
+                            <!-- Filter bar -->
+                            <div class="score-filter-bar">
+                                <button class="filter-quick-btn active" data-score-dept="ALL"
+                                    onclick="setScoreDeptFilter(this,'ALL')">Tất cả</button>
+                                <button class="filter-quick-btn" data-score-dept="L&D"
+                                    onclick="setScoreDeptFilter(this,'L&D')">L&D</button>
+                                <button class="filter-quick-btn" data-score-dept="R&R"
+                                    onclick="setScoreDeptFilter(this,'R&R')">R&R</button>
+                                <button class="filter-quick-btn" data-score-dept="ER"
+                                    onclick="setScoreDeptFilter(this,'ER')">ER</button>
+                                <button class="filter-quick-btn" data-score-dept="EB"
+                                    onclick="setScoreDeptFilter(this,'EB')">EB</button>
+                                <div class="score-search-box">
+                                    <i class="fa-solid fa-search"></i>
+                                    <input type="text" id="search-score" placeholder="Tìm thành viên..."
+                                        onkeyup="calculateFinalScores()">
+                                </div>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Thành viên</th>
+                                            <th>3. Điểm Project</th>
+                                            <th>2. Điểm CLB</th>
+                                            <th>1. Điểm Ban</th>
+                                            <th>Tổng Điểm (Thang 10)</th>
+                                            <th>Xếp Loại</th>
+                                            <th>Chi tiết</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="score-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- CLB Eval -->
+                        <div id="eval-club" class="eval-pane">
+                            <div class="pane-header">
+                                <h3>2. Đánh giá Hoạt động CLB</h3>
+                            </div>
+                            <div class="form-wrapper">
+                                <div class="input-group searchable-dropdown-container">
+                                    <label>Chọn Thành viên</label>
+                                    <div class="searchable-btn" onclick="toggleDropdown('club-member-dropdown')"
+                                        id="btn-club-member">-- Tìm &amp; chọn người --</div>
+                                    <div class="searchable-dropdown" id="club-member-dropdown">
+                                        <input type="text" class="searchable-input" placeholder="Tìm kiếm...">
+                                        <ul class="searchable-list" id="list-club-member"></ul>
+                                    </div>
+                                    <input type="hidden" id="eval-club-member">
+                                </div>
+                                <div class="input-group">
+                                    <label>2.1. Kỷ luật (Điểm CỘNG/TRỪ thủ công)</label>
+                                    <input type="number" id="club-discipline-score" placeholder="VD: 2 hoặc -1">
+                                </div>
+                                <div class="input-group full-width">
+                                    <label>Lý do</label>
+                                    <input type="text" id="club-discipline-reason"
+                                        placeholder="Ví dụ: Đi muộn họp ban...">
+                                </div>
+                                <div class="input-group">
+                                    <label>2.4 Tuyên truyền, PT Hình ảnh CLB (Thang 10)</label>
+                                    <input type="number" id="club-brand-score" placeholder="0–10" min="0" max="10">
+                                </div>
+                                <button class="btn-primary" onclick="saveClubEval()">Lưu Đánh Giá CLB</button>
+                            </div>
+                        </div>
+
+                        <!-- Dept Eval -->
+                        <div id="eval-dept" class="eval-pane">
+                            <div class="pane-header">
+                                <h3>1. Trưởng/Phó Ban đánh giá</h3>
+                                <p>Nhập điểm cho từng tiêu chí, hệ thống tự động nhân trọng số tối đa 10đ.</p>
+                            </div>
+                            <div class="form-wrapper">
+                                <div class="input-group searchable-dropdown-container">
+                                    <label>Chọn Thành viên</label>
+                                    <div class="searchable-btn" onclick="toggleDropdown('dept-member-dropdown')"
+                                        id="btn-dept-member">-- Tìm &amp; chọn người --</div>
+                                    <div class="searchable-dropdown" id="dept-member-dropdown">
+                                        <input type="text" class="searchable-input" placeholder="Tìm kiếm...">
+                                        <ul class="searchable-list" id="list-dept-member"></ul>
+                                    </div>
+                                    <input type="hidden" id="eval-dept-member">
+                                </div>
+                                <div class="input-group"><label>Tinh thần trách nhiệm, kỷ luật (×0.1)</label><input
+                                        type="number" id="dept-rule-score" min="0" max="10" placeholder="Thang 10">
+                                </div>
+                                <div class="input-group"><label>Mối quan hệ với TB/PB (×0.1)</label><input type="number"
+                                        id="dept-head-rel" min="0" max="10" placeholder="Thang 10"></div>
+                                <div class="input-group"><label>Mối quan hệ với thành viên ban (×0.1)</label><input
+                                        type="number" id="dept-mem-rel" min="0" max="10" placeholder="Thang 10"></div>
+                                <div class="input-group"><label>Hỗ trợ công việc team khác (×0.2)</label><input
+                                        type="number" id="dept-support" min="0" max="10" placeholder="Thang 10"></div>
+                                <div class="input-group"><label>Chất lượng CV - Teambuilding (×0.1)</label><input
+                                        type="number" id="dept-q1" min="0" max="10" placeholder="Thang 10"></div>
+                                <div class="input-group"><label>Chất lượng CV - Trung thu (×0.2)</label><input
+                                        type="number" id="dept-q2" min="0" max="10" placeholder="Thang 10"></div>
+                                <div class="input-group"><label>Chất lượng CV - Tuyển CTV (×0.2)</label><input
+                                        type="number" id="dept-q3" min="0" max="10" placeholder="Thang 10"></div>
+                                <div class="input-group full-width"><label>Điểm cộng Đóng góp phát triển</label><input
+                                        type="number" id="dept-bonus" placeholder="VD: 1"></div>
+                                <button class="btn-primary" onclick="saveDeptEval()">Lưu Đánh Giá Ban</button>
+                            </div>
+                        </div>
+
+                        <!-- 360 Form -->
+                        <div id="eval-project" class="eval-pane">
+                            <div class="pane-header">
+                                <h3>3. Phiếu Đánh giá Dự án chéo </h3>
+                                <p>Chọn dự án và tên của bạn, hệ thống tự tạo form đánh giá chéo.</p>
+                            </div>
+                            <div id="eval-project-setup-view" class="form-wrapper"
+                                style="max-width:600px;margin:40px auto;text-align:center;">
+                                <div class="evaluation-card bg-highlight" style="text-align:left;">
+                                    <div class="input-group searchable-dropdown-container full-width">
+                                        <label>1. Chọn Dự án / Sự kiện</label>
+                                        <div class="searchable-btn" onclick="toggleDropdown('prj-dropdown')"
+                                            id="btn-prj">-- Tìm &amp; chọn dự án --</div>
+                                        <div class="searchable-dropdown" id="prj-dropdown">
+                                            <input type="text" class="searchable-input" placeholder="Tìm kiếm...">
+                                            <ul class="searchable-list" id="list-prj"></ul>
+                                        </div>
+                                        <input type="hidden" id="eval-prj-id" onchange="loadPrjMembersForEval()">
+                                    </div>
+                                    <div class="input-group searchable-dropdown-container full-width"
+                                        style="margin-top:16px;">
+                                        <label>2. Tên của bạn</label>
+                                        <div class="searchable-btn" onclick="toggleDropdown('rater-dropdown')"
+                                            id="btn-rater">-- Ai đang đánh giá? --</div>
+                                        <div class="searchable-dropdown" id="rater-dropdown">
+                                            <input type="text" class="searchable-input" placeholder="Tìm...">
+                                            <ul class="searchable-list" id="list-rater"></ul>
+                                        </div>
+                                        <input type="hidden" id="eval-prj-rater">
+                                    </div>
+                                </div>
+                                <button class="btn-primary"
+                                    style="padding:16px 32px;font-size:1.1rem;width:100%;justify-content:center;"
+                                    onclick="startCinematicEvaluation()">Bắt đầu làm Form <i
+                                        class="fa-solid fa-rocket"></i></button>
+                            </div>
+                            <!-- Cinematic inline -->
+                            <div id="cinematic-eval-inline"
+                                style="display:none;position:relative;border-radius:24px;overflow:hidden;margin-top:24px;padding:40px;background:#05070a;color:#f8fafc;font-family:'Inter',sans-serif;">
+                                <div class="lux-progress-container" style="position:absolute;top:0;left:0;width:100%;">
+                                    <div class="lux-progress-bar" id="lux-progress-bar"></div>
+                                </div>
+                                <div class="lux-step-indicator" id="lux-step-indicator"
+                                    style="position:absolute;top:20px;right:40px;">BƯỚC 1 / X</div>
+                                <button class="lux-close-btn" style="position:absolute;top:20px;left:20px;"
+                                    onclick="closeCinematicEval()"><i class="fa-solid fa-xmark"></i></button>
+                                <div class="cinematic-bg" style="position:absolute;">
+                                    <div class="cine-orb cine-orb-1"></div>
+                                    <div class="cine-orb cine-orb-2"></div>
+                                </div>
+                                <main class="cine-container" style="max-width:800px;margin:40px auto 0;">
+                                    <header class="cine-header" style="margin-bottom:32px;">
+                                        <h1 class="cine-title" style="font-size:2.5rem;">Club Peer Review</h1>
+                                        <p class="cine-subtitle" id="cine-project-name">Đánh giá chéo dự án</p>
+                                    </header>
+                                    <form id="multiStepForm">
+                                        <div id="cine-form-steps-container"></div>
+                                    </form>
+                                    <div id="cine-success-overlay" class="cine-success-overlay"
+                                        style="position:absolute;inset:0;z-index:100;border-radius:0;">
+                                        <div class="cine-success-card">
+                                            <i class="fa-solid fa-circle-check checkmark-icon"></i>
+                                            <h2>Đã hoàn thành!</h2>
+                                            <p>Cảm ơn bạn đã thực hiện đánh giá.</p>
+                                            <button class="btn-secondary" style="margin-top:24px;"
+                                                onclick="closeCinematicEval()">Hoàn tất &amp; Đóng</button>
+                                        </div>
+                                    </div>
+                                </main>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: FEEDBACK & CONFESSION -->
+                <section id="feedback-view" class="view-section">
+                    <div class="section-actions">
+                        <div>
+                            <h3 style="font-size:1.5rem;">Góp Ý &amp; Confession</h3>
+                            <p style="color:var(--text-muted);font-size:0.9rem;">Ẩn danh tuyệt đối — không ghi lại danh
+                                tính người gửi.</p>
+                        </div>
+                        <div class="search-box" style="width:auto;">
+                            <select id="filter-feedback-prj" class="styled-select" onchange="renderFeedbacks()">
+                                <option value="ALL">Toàn bộ Dự án</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="fb-tabs">
+                        <button class="fb-tab active" onclick="switchFbTab(this,'fb-pane-feedback')"><i
+                                class="fa-solid fa-comment-dots"></i> Hòm Góp Ý</button>
+                        <button class="fb-tab" onclick="switchFbTab(this,'fb-pane-confession')"><i
+                                class="fa-solid fa-heart"></i> Confession Box</button>
+                    </div>
+
+                    <!-- Pane: Feedbacks -->
+                    <div id="fb-pane-feedback" class="fb-pane active">
+                        <div class="feedback-grid" id="feedback-grid"></div>
+                        <div id="feedback-empty" class="empty-state" style="display:none">Chưa có phản hồi nào</div>
+                    </div>
+
+                    <!-- Pane: Confession -->
+                    <div id="fb-pane-confession" class="fb-pane">
+                        <div class="confession-form-card">
+                            <h3><i class="fa-solid fa-feather-pointed"></i> Viết Confession</h3>
+                            <p>Chia sẻ tự do — hoàn toàn ẩn danh. Không ai biết đây là của bạn.</p>
+                            <textarea id="confession-text"
+                                placeholder="Viết bất cứ điều gì bạn muốn nói... một lời cảm ơn, một điều muốn bày tỏ, một bí mật nhỏ 💌"></textarea>
+                            <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+                                <button class="btn-primary" onclick="submitConfession()">
+                                    <i class="fa-solid fa-paper-plane"></i> Gửi Confession
+                                </button>
+                            </div>
+                        </div>
+                        <div class="confession-grid" id="confession-grid"></div>
+                        <div id="confession-empty" class="empty-state" style="display:none">Chưa có confession nào. Hãy
+                            là người đầu tiên!</div>
+                    </div>
+                </section>
+
+                <!-- VIEW: EVIDENCE -->
+                <section id="evidence-view" class="view-section">
+                    <div class="section-actions">
+                        <div>
+                            <h3 style="font-size:1.5rem;">Nộp Minh Chứng</h3>
+                            <p style="color:var(--text-muted);font-size:0.9rem;">Lưu trữ hình ảnh minh chứng hoạt động
+                                của từng thành viên.</p>
+                        </div>
+                    </div>
+                    <div class="evidence-filter-bar">
+                        <button class="filter-quick-btn active" onclick="setEvidenceFilter(this,'ALL')">Tất cả</button>
+                        <button class="filter-quick-btn" onclick="setEvidenceFilter(this,'L&D')">L&D</button>
+                        <button class="filter-quick-btn" onclick="setEvidenceFilter(this,'R&R')">R&R</button>
+                        <button class="filter-quick-btn" onclick="setEvidenceFilter(this,'ER')">ER</button>
+                        <button class="filter-quick-btn" onclick="setEvidenceFilter(this,'EB')">EB</button>
+                        <div class="score-search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="search-evidence" placeholder="Tìm thành viên..."
+                                onkeyup="renderEvidenceFolders()">
+                        </div>
+                    </div>
+                    <div class="evidence-grid" id="evidence-grid"></div>
+                    <div id="evidence-empty" class="empty-state" style="display:none">Chưa có thành viên nào</div>
+                </section>
+
+                <!-- VIEW: PHOTOBOOTH -->
+                <section id="photobooth-view" class="view-section">
+                    <div class="section-actions">
+                        <div>
+                            <h3 style="font-size:1.5rem;"><i class="fa-solid fa-camera"></i> HuReA Photobooth</h3>
+                            <p style="color:var(--text-muted);font-size:0.9rem;">Chụp ảnh kỷ niệm — lưu local, không
+                                upload.</p>
+                        </div>
+                        <button class="btn-primary" id="ptb-download-btn" onclick="downloadStrip()"
+                            style="display:none;">
+                            <i class="fa-solid fa-download"></i> Lưu Strip
+                        </button>
+                    </div>
+                    <div class="photobooth-layout">
+                        <!-- Camera -->
+                        <div class="photobooth-camera-card">
+                            <video id="ptb-video" autoplay muted playsinline></video>
+                            <canvas id="ptb-canvas" style="display:none;"></canvas>
+                            <div class="ptb-countdown-overlay" id="ptb-countdown"></div>
+                            <div class="ptb-flash" id="ptb-flash"></div>
+                            <div class="ptb-controls" style="width:100%;justify-content:center;flex-wrap:wrap;">
+                                <div class="ptb-filter-list">
+                                    <button class="ptb-filter-btn active"
+                                        onclick="setPtbFilter(this,'')">Normal</button>
+                                    <button class="ptb-filter-btn"
+                                        onclick="setPtbFilter(this,'filter-bw')">B&amp;W</button>
+                                    <button class="ptb-filter-btn"
+                                        onclick="setPtbFilter(this,'filter-vintage')">Vintage</button>
+                                    <button class="ptb-filter-btn"
+                                        onclick="setPtbFilter(this,'filter-warm')">Warm</button>
+                                </div>
+                                <button class="ptb-shoot-btn" id="ptb-shoot-btn" onclick="startPtbCountdown()"
+                                    title="Chụp ảnh">
+                                    <i class="fa-solid fa-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Strip Panel -->
+                        <div class="photobooth-panel">
+                            <div class="ptb-strip-card">
+                                <h4><i class="fa-solid fa-film"></i> Photo Strip</h4>
+                                <div class="ptb-strip" id="ptb-strip">
+                                    <div style="color:#999;font-size:0.85rem;text-align:center;padding:20px;">Chụp 3 ảnh
+                                        để tạo strip</div>
+                                </div>
+                                <div class="ptb-shot-row" id="ptb-shot-row">
+                                    <canvas class="ptb-shot-thumb" id="ptb-thumb-0" width="90" height="68"></canvas>
+                                    <canvas class="ptb-shot-thumb" id="ptb-thumb-1" width="90" height="68"></canvas>
+                                    <canvas class="ptb-shot-thumb" id="ptb-thumb-2" width="90" height="68"></canvas>
+                                </div>
+                                <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;">Ảnh <span
+                                        id="ptb-count">0</span>/3</p>
+                            </div>
+                            <button class="btn-secondary" onclick="resetPhotobooth()"><i
+                                    class="fa-solid fa-rotate-left"></i> Chụp lại</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="bug-report-view" class="view-section">
+                    <div class="section-actions">
+                        <div>
+                            <h3 style="font-size:1.5rem;"><i class="fa-solid fa-bug-slash"></i> Báo cáo lỗi hệ thống
+                            </h3>
+                            <p style="color:var(--text-muted);font-size:0.9rem;">Hãy giúp chúng tôi hoàn thiện hệ thống
+                                bằng cách báo cáo các lỗi bạn gặp phải.</p>
+                        </div>
+                    </div>
+
+                    <div class="bug-report-layout">
+                        <!-- Form Section -->
+                        <div class="bug-form-column glass-panel">
+                            <div class="column-header">
+                                <div class="header-main">
+                                    <span class="icon-orb orb-bug"><i class="fa-solid fa-bug-slash"></i></span>
+                                    <div class="header-text">
+                                        <h2>Gửi báo cáo mới</h2>
+                                        <p>Cung cấp chi tiết để chúng tôi hỗ trợ tốt nhất</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lux-form">
+                                <div class="input-group-v2">
+                                    <label><i class="fa-solid fa-heading"></i> Tiêu đề lỗi</label>
+                                    <input type="text" id="bug-title"
+                                        placeholder="VD: Lỗi hiển thị điểm trên mobile...">
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="input-group-v2">
+                                        <label><i class="fa-solid fa-layer-group"></i> Vị trí</label>
+                                        <input type="text" id="bug-area" placeholder="VD: Trang Tổng quan">
+                                    </div>
+                                    <div class="input-group-v2">
+                                        <label><i class="fa-solid fa-gauge-high"></i> Mức độ</label>
+                                        <select id="bug-priority" class="lux-select">
+                                            <option value="LOW">Thấp (Giao diện / Text)</option>
+                                            <option value="MEDIUM">Trung bình (Chức năng)</option>
+                                            <option value="HIGH">Nghiêm trọng (Dữ liệu / Crash)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="input-group-v2">
+                                    <label><i class="fa-solid fa-pen-nib"></i> Mô tả chi tiết</label>
+                                    <textarea id="bug-desc" rows="4"
+                                        placeholder="Mô tả các bước tái hiện lỗi hoặc hành vi mong đợi..."></textarea>
+                                </div>
+
+                                <div class="input-group-v2">
+                                    <label><i class="fa-solid fa-image"></i> Ảnh chụp màn hình</label>
+                                    <input type="file" id="bug-screenshot" accept="image/*" style="display:none"
+                                        onchange="handleImagePreview(this, 'bug-preview')">
+                                    <div class="lux-dropzone"
+                                        onclick="document.getElementById('bug-screenshot').click()">
+                                        <div id="bug-preview" class="upload-preview-area">
+                                            <div class="drop-circle">
+                                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                            </div>
+                                            <div class="drop-text">
+                                                <strong>Nhấp để tải ảnh lên</strong>
+                                                <span>Hỗ trợ định dạng JPG, PNG</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="btn-lux-primary" onclick="submitBugReport()">
+                                    <span>Gửi báo cáo ngay</span>
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- History Section -->
+                        <div class="bug-history-column glass-panel">
+                            <div class="column-header">
+                                <div class="header-main">
+                                    <span class="icon-orb orb-history"><i
+                                            class="fa-solid fa-clock-rotate-left"></i></span>
+                                    <div class="header-text">
+                                        <h2>Lịch sử báo cáo</h2>
+                                        <p>Theo dõi tiến độ xử lý các vấn đề của bạn</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="bug-list" class="bug-timeline card-scroll">
+                                <div class="empty-feed">
+                                    <i class="fa-solid fa-clipboard-check"></i>
+                                    <p>Tạm thời chưa có báo cáo nào. Hệ thống của bạn đang rất ổn định!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="empty-mini">Chưa có báo cáo lỗi nào được ghi lại.</div>
+                </section>
+                
+                <!-- VIEW: PIN MANAGEMENT (Admin Only) -->
+                <section id="pin-management-view" class="view-section">
+                    <div class="section-actions">
+                        <div>
+                            <h3 style="font-size:1.5rem;"><i class="fa-solid fa-key"></i> Quản lý mã PIN Thành viên</h3>
+                            <p style="color:var(--text-muted);font-size:0.9rem;">Xem và cập nhật mã PIN cho các thành viên trong hệ thống.</p>
+                        </div>
+                        <div style="display:flex; gap:16px; align-items:center;">
+                            <div class="dept-pills-v2" id="pin-dept-pills" style="margin:0;">
+                                <button class="pill active" onclick="setPinDeptFilter(this, 'ALL')">Tất cả</button>
+                                <button class="pill" onclick="setPinDeptFilter(this, 'L&D')">L&D</button>
+                                <button class="pill" onclick="setPinDeptFilter(this, 'R&R')">R&R</button>
+                                <button class="pill" onclick="setPinDeptFilter(this, 'ER')">ER</button>
+                                <button class="pill" onclick="setPinDeptFilter(this, 'EB')">EB</button>
+                                <button class="pill" onclick="setPinDeptFilter(this, 'BCN')">BCN/Khác</button>
+                            </div>
+                            <div class="search-box">
+                                <i class="fa-solid fa-search"></i>
+                                <input type="text" id="search-pin-mgmt" placeholder="Tìm thành viên..." onkeyup="renderPinManagement()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Thành viên</th>
+                                    <th>Ban</th>
+                                    <th>Mã PIN hiện tại</th>
+                                    <th style="width:120px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pin-mgmt-tbody"></tbody>
+                        </table>
+                        <div id="pin-mgmt-empty" class="empty-state" style="display:none">Không tìm thấy thành viên phù hợp</div>
+                    </div>
+                </section>
+
+    </div><!-- /content-container -->
+    </main>
+    </div><!-- /dashboard-layout -->
+
+    <!-- ===== MODALS ===== -->
+    <!-- Modal: Score Detail -->
+    <div class="modal" id="score-detail-modal">
+        <div class="modal-wrapper modal-lg">
+            <div class="modal-header">
+                <h3 id="score-detail-title">Chi tiết điểm</h3>
+                <button class="close-btn" onclick="closeModal('score-detail-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="score-detail-body">
+                <!-- Rendered by JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('score-detail-modal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Member Detail -->
+    <div class="modal" id="member-detail-modal">
+        <div class="modal-wrapper modal-lg">
+            <div class="modal-header">
+                <h3>Chi tiết Thành viên</h3>
+                <button class="close-btn" onclick="closeModal('member-detail-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="member-detail-card bg-highlight">
+                    <div class="member-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                    <div class="member-info-text">
+                        <h2 id="md-name">Trần Văn A</h2>
+                        <span class="version-badge" id="md-dept">Ban L&D</span>
+                        <div class="md-sub">
+                            <p><strong>Khóa:</strong> <span id="md-cohort"></span></p>
+                            <p><strong>Lớp:</strong> <span id="md-class"></span></p>
+                            <p><strong>Chuyên ngành:</strong> <span id="md-major"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <h4 style="margin-top:24px;margin-bottom:12px;">Chương trình đã tham gia (Nhiệm kỳ hiện tại)</h4>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tên dự án</th>
+                                <th>Phân loại</th>
+                                <th>Vai trò</th>
+                            </tr>
+                        </thead>
+                        <tbody id="md-projects-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Member Edit -->
+    <div class="modal" id="member-modal">
+        <div class="modal-wrapper">
+            <div class="modal-header">
+                <h3 id="member-modal-title">Thêm / Sửa Thành Viên</h3>
+                <button class="close-btn" onclick="closeModal('member-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="member-form">
+                    <input type="hidden" id="member-id">
+                    <div class="input-group"><label>Họ và Tên</label><input type="text" id="m-name" required></div>
+                    <div class="input-group"><label>Lớp</label><input type="text" id="m-class" required></div>
+                    <div class="input-group"><label>Khóa</label><input type="text" id="m-cohort" required></div>
+                    <div class="input-group"><label>Chuyên ngành</label><input type="text" id="m-major" required></div>
+                    <div class="input-group"><label>Ban</label>
+                        <select id="m-dept" required>
+                            <option value="L&D">L&D</option>
+                            <option value="R&R">R&R</option>
+                            <option value="ER">ER</option>
+                            <option value="EB">EB</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('member-modal')">Hủy</button>
+                <button class="btn-primary" onclick="saveMember()">Lưu Thành Viên</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Batch Member -->
+    <div class="modal" id="batch-member-modal">
+        <div class="modal-wrapper modal-lg">
+            <div class="modal-header">
+                <h3>Thêm Danh Sách Nhanh (Paste từ Excel)</h3>
+                <button class="close-btn" onclick="closeModal('batch-member-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:16px;font-size:0.95rem;color:var(--text-muted);">
+                    Copy dữ liệu từ Excel gồm 2 cột (<strong>Họ Tên</strong> và <strong>Ban</strong>) rồi Paste vào bên
+                    dưới.
+                    <span style="color:var(--accent-red);font-weight:700;">Tên trùng với dữ liệu hiện có sẽ được báo và
+                        bỏ qua.</span>
+                </p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                    <div class="input-group"><label>Khóa mặc định</label><input type="text" id="bm-cohort"
+                            placeholder="VD: 12" value="12"></div>
+                    <div class="input-group"><label>Lớp mặc định</label><input type="text" id="bm-class"
+                            placeholder="VD: Chưa phân bổ" value="Chưa phân bổ"></div>
+                </div>
+                <div class="input-group full-width">
+                    <label>Paste Dữ liệu (Họ Tên [Tab] Ban)</label>
+                    <textarea id="bm-data" rows="12" placeholder="Nguyễn Văn A&#9;L&D&#10;Trần Thị B&#9;R&R"
+                        style="width:100%;border:1px solid #334155;border-radius:12px;background:var(--bg-sub);color:#e2e8f0;padding:16px;font-family:monospace;resize:y;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('batch-member-modal')">Hủy</button>
+                <button class="btn-primary" onclick="processBatchMembers()">Nhập Danh Sách Này</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Project -->
+    <div class="modal" id="project-modal">
+        <div class="modal-wrapper modal-lg">
+            <div class="modal-header">
+                <h3 id="project-modal-title">Khởi tạo Dự Án</h3>
+                <button class="close-btn" onclick="closeModal('project-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="project-form">
+                    <input type="hidden" id="p-id">
+                    <div class="input-group full-width"><label>Tên Chương trình / Dự án</label><input type="text"
+                            id="p-name" required></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                        <div class="input-group"><label>Nhiệm kỳ</label><select id="p-term" required></select></div>
+                        <div class="input-group"><label>Phân loại</label>
+                            <select id="p-type" required>
+                                <option value="internal">2.3. Chương trình Nội bộ</option>
+                                <option value="event">2.2. Sự kiện Tổ chức</option>
+                            </select>
+                        </div>
+                        <div class="input-group"><label>Trạng thái</label>
+                            <select id="p-status">
+                                <option value="setup">⚙️ Setup</option>
+                                <option value="running">🟢 Running</option>
+                                <option value="finish">✅ Finish</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group full-width">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="p-has-pl" checked>
+                            Dự án này có chức danh Project Leader (PL)
+                        </label>
+                    </div>
+
+                    <div class="participant-manager">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <h4 style="margin:0;">Quản lý Nhân sự Tham gia</h4>
+                            <button type="button" class="btn-primary btn-sm" onclick="openMemberSelectModal()">
+                                <i class="fa-solid fa-users-plus"></i> Chọn Nhân sự
+                            </button>
+                        </div>
+                        <ul class="participant-list" id="p-participant-list"></ul>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('project-modal')">Hủy</button>
+                <button class="btn-primary" onclick="saveProject()">Lưu Dự Án</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Member Select Fullscreen -->
+    <div class="modal member-select-modal" id="member-select-modal">
+        <div class="modal-wrapper">
+            <div class="modal-header">
+                <h3 id="ms-title">Chọn Nhân Sự Tham Gia</h3>
+                <button class="close-btn" onclick="closeModal('member-select-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <!-- Step 1: Select members -->
+            <div id="ms-step-1">
+                <div class="ms-filter-bar">
+                    <button class="filter-quick-btn active" onclick="setMsFilter(this,'ALL')">Tất cả</button>
+                    <button class="filter-quick-btn" onclick="setMsFilter(this,'L&D')">L&D</button>
+                    <button class="filter-quick-btn" onclick="setMsFilter(this,'R&R')">R&R</button>
+                    <button class="filter-quick-btn" onclick="setMsFilter(this,'ER')">ER</button>
+                    <button class="filter-quick-btn" onclick="setMsFilter(this,'EB')">EB</button>
+                    <div class="score-search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="ms-search" placeholder="Tìm thành viên..." onkeyup="renderMsGrid()">
+                    </div>
+                </div>
+                <div class="ms-member-grid" id="ms-member-grid"></div>
+            </div>
+            <!-- Step 2: Assign roles -->
+            <div id="ms-step-2" style="display:none;">
+                <div
+                    style="padding:16px 24px;border-bottom:1px solid var(--border-color);font-weight:600;color:var(--text-muted);font-size:0.9rem;">
+                    Gán vị trí cho từng thành viên (mặc định: Core Team)
+                </div>
+                <div class="ms-role-list" id="ms-role-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="ms-back-btn" style="display:none;" onclick="msGoBack()">← Quay
+                    lại</button>
+                <button class="btn-secondary" onclick="closeModal('member-select-modal')">Hủy</button>
+                <button class="btn-primary" id="ms-next-btn" onclick="msNextStep()">Tiếp theo →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Term -->
+    <div class="modal" id="term-modal">
+        <div class="modal-wrapper modal-lg">
+            <div class="modal-header">
+                <h3 id="term-modal-title">Sửa / Thêm Nhiệm Kỳ</h3>
+                <button class="close-btn" onclick="closeModal('term-modal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="t-id">
+                <div class="input-group full-width"><label>Tên nhiệm kỳ</label><input type="text" id="t-name" required>
+                </div>
+                <h4 style="margin:20px 0 10px;">Ban Chủ Nhiệm</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="input-group"><label>Chủ Nhiệm</label><input type="text" id="t-bcn-president"></div>
+                    <div class="input-group"><label>Phó Chủ Nhiệm</label><input type="text" id="t-bcn-vp"></div>
+                </div>
+                <h4 style="margin:20px 0 10px;">Trưởng / Phó Ban Chuyên Môn</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="input-group"><label>Trưởng/Phó Ban L&D</label><input type="text" id="t-head-ld"></div>
+                    <div class="input-group"><label>Trưởng/Phó Ban R&R</label><input type="text" id="t-head-rr"></div>
+                    <div class="input-group"><label>Trưởng/Phó Ban ER</label><input type="text" id="t-head-er"></div>
+                    <div class="input-group"><label>Trưởng/Phó Ban EB</label><input type="text" id="t-head-eb"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('term-modal')">Hủy</button>
+                <button class="btn-primary" onclick="saveTerm()">Tạo / Lưu Nhiệm Kỳ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Evidence Folder -->
+    <div class="modal" id="evidence-folder-modal">
+        <div class="modal-wrapper modal-lg">
+            <div class="modal-header">
+                <h3 id="evidence-folder-title">📁 Minh chứng</h3>
+                <button class="close-btn" onclick="closeModal('evidence-folder-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;">
+                    <input type="text" id="evidence-folder-rename" placeholder="Đổi tên folder..." style="flex:1;">
+                    <button class="btn-secondary btn-sm" onclick="renameEvidenceFolder()"><i
+                            class="fa-solid fa-pen"></i> Đổi tên</button>
+                </div>
+                <div class="evidence-photo-grid" id="evidence-photo-grid"></div>
+                <label class="evidence-upload-zone" for="evidence-file-input">
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem;margin-bottom:8px;display:block;"></i>
+                    Nhấn để thêm ảnh minh chứng
+                </label>
+                <input type="file" id="evidence-file-input" accept="image/*" multiple style="display:none;"
+                    onchange="handleEvidenceUpload(this)">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('evidence-folder-modal')">Đóng</button>
+                <button class="btn-primary" onclick="saveEvidenceFolder()"><i class="fa-solid fa-cloud-upload-alt"></i>
+                    Lưu &amp; Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Announcement -->
+    <div id="announcement-modal" class="modal">
+        <div class="modal-wrapper" style="max-width:600px">
+            <div class="modal-header" style="border-bottom:none;padding-bottom:10px;">
+                <div class="header-main">
+                    <span class="icon-orb orb-primary"><i class="fa-solid fa-bullhorn"></i></span>
+                    <div class="header-text">
+                        <h3 id="ann-modal-title" style="margin:0;color:var(--text-main);font-size:1.2rem;">Đăng Thông
+                            Báo Mới</h3>
+                        <p style="margin:0;color:var(--text-muted);font-size:0.85rem;">Thông tin sẽ được cập nhật trên
+                            Dashboard</p>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeModal('announcement-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="modal-body lux-form" style="padding-top:10px;">
+                <input type="hidden" id="ann-id">
+                <input type="hidden" id="ann-type">
+
+                <div class="input-group-v2">
+                    <label><i class="fa-solid fa-heading"></i> Tiêu đề thông báo</label>
+                    <input type="text" id="ann-title" placeholder="VD: Khảo sát chất lượng dự án...">
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group-v2" id="ann-dept-group" style="display:none">
+                        <label><i class="fa-solid fa-layer-group"></i> Ban chuyên môn</label>
+                        <select id="ann-dept-select" class="lux-select">
+                            <option value="L&D">L&D</option>
+                            <option value="R&R">R&R</option>
+                            <option value="ER">ER</option>
+                            <option value="EB">EB</option>
+                        </select>
+                    </div>
+                    <div class="input-group-v2">
+                        <label><i class="fa-solid fa-circle-exclamation"></i> Mức độ ưu tiên</label>
+                        <select id="ann-priority" class="lux-select">
+                            <option value="NORMAL">Bình thường (Xám)</option>
+                            <option value="HIGH">Quan trọng (Vàng)</option>
+                            <option value="URGENT">Khẩn cấp (Đỏ)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group-v2">
+                    <label><i class="fa-solid fa-image"></i> Đính kèm hình ảnh (Tuỳ chọn)</label>
+                    <input type="file" id="ann-image-input" accept="image/*" style="display:none"
+                        onchange="handleImagePreview(this, 'ann-preview')">
+                    <div class="lux-dropzone" style="height:100px;"
+                        onclick="document.getElementById('ann-image-input').click()">
+                        <div id="ann-preview" class="upload-preview-area">
+                            <div class="drop-circle" style="width:40px;height:40px;font-size:1rem;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                            <div class="drop-text" style="flex-direction:row;align-items:center;gap:12px;">
+                                <strong>Nhấn để tải ảnh</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group-v2">
+                    <label><i class="fa-solid fa-align-left"></i> Nội dung chi tiết</label>
+                    <textarea id="ann-content" placeholder="Nội dung sẽ hiển thị chi tiết..." rows="4"></textarea>
+                </div>
+
+                <button class="btn-lux-primary" onclick="saveAnnouncement()">
+                    <span>Đăng thông báo</span>
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Bug Detail -->
+    <div id="bug-detail-modal" class="modal">
+        <div class="modal-wrapper" style="max-width:700px">
+            <div class="modal-header" style="border-bottom:none;padding-bottom:10px;">
+                <div class="header-main">
+                    <span class="icon-orb orb-bug"><i class="fa-solid fa-bug"></i></span>
+                    <div class="header-text">
+                        <h3 id="bug-detail-title" style="margin:0;color:var(--text-main);font-size:1.2rem;">Chi tiết Lỗi
+                        </h3>
+                        <p id="bug-detail-status" style="margin:0;color:var(--text-muted);font-size:0.85rem;"></p>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeModal('bug-detail-modal')"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body lux-form" style="padding-top:10px;color:var(--text-main);">
+                <div
+                    style="background:var(--bg-sidebar);padding:16px;border-radius:12px;margin-bottom:16px;border:1px solid var(--border-color);">
+                    <strong style="display:block;margin-bottom:6px;font-size:0.85rem;color:var(--text-muted);">Vị trí:
+                        <span id="bug-detail-area" style="color:var(--primary);"></span></strong>
+                    <p id="bug-detail-desc" style="font-size:0.95rem;line-height:1.5;margin:0;color:var(--text-main);">
+                    </p>
+                </div>
+                <div id="bug-detail-image-container" style="text-align:center;">
+                    <img id="bug-detail-image" src="" alt="Bug Screenshot"
+                        style="max-width:100%;border-radius:12px;border:1px solid var(--border-color);display:none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Edit PIN (Admin Only) -->
+    <div class="modal" id="edit-pin-modal">
+        <div class="modal-wrapper" style="max-width:400px">
+            <div class="modal-header">
+                <h3>Cập nhật mã PIN</h3>
+                <button class="close-btn" onclick="closeModal('edit-pin-modal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="edit-pin-member-info" style="margin-bottom:16px; font-weight:600; color:var(--primary);"></div>
+                <input type="hidden" id="edit-pin-m-id">
+                <div class="input-group full-width">
+                    <label>Mã PIN mới (6 chữ số)</label>
+                    <div class="pin-input-row" id="admin-pin-edit-row">
+                        <input type="text" maxlength="1" class="pin-box">
+                        <input type="text" maxlength="1" class="pin-box">
+                        <input type="text" maxlength="1" class="pin-box">
+                        <input type="text" maxlength="1" class="pin-box">
+                        <input type="text" maxlength="1" class="pin-box">
+                        <input type="text" maxlength="1" class="pin-box">
+                    </div>
+                    <small style="color:var(--text-muted)">Hệ thống sẽ cập nhật ngay lập tức lên Google Sheets.</small>
+                </div>
+                <div id="admin-pin-error" class="pin-error" style="display:none; margin-top:10px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('edit-pin-modal')">Hủy</button>
+                <button class="btn-primary" onclick="saveUserPinAdmin()">Cập nhật PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay: Member Selector -->
+    <div id="login-selector-overlay" class="login-selector-overlay hidden">
+        <div class="selector-content">
+            <div class="selector-header">
+                <div class="header-main">
+                    <button class="btn-back" onclick="closeLoginSelector()">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <h2>Chọn thành viên</h2>
+                </div>
+                <div class="selector-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="login-member-search" placeholder="Tìm tên của bạn..." onkeyup="renderLoginMemberSelector()">
+                </div>
+                <div class="login-dept-pills" id="login-dept-pills">
+                    <button class="login-pill active" onclick="setLoginDeptFilter(this, 'ALL')">Tất cả</button>
+                    <button class="login-pill" onclick="setLoginDeptFilter(this, 'L&D')">L&D</button>
+                    <button class="login-pill" onclick="setLoginDeptFilter(this, 'R&R')">R&R</button>
+                    <button class="login-pill" onclick="setLoginDeptFilter(this, 'ER')">ER</button>
+                    <button class="login-pill" onclick="setLoginDeptFilter(this, 'EB')">EB</button>
+                    <button class="login-pill" onclick="setLoginDeptFilter(this, 'BCN')">BCN/Khác</button>
+                </div>
+            </div>
+            <div class="selector-body" id="login-member-list">
+                <div class="login-member-loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-export-container" style="display:none;"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
